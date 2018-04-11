@@ -1,52 +1,57 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <unistd.h>
-#include <stdint.h>
-#include <pthread.h>
 #include <errno.h>
+#include <time.h>
+#include <sys/neutrino.h>
 
-
-void* thread_work(void* time_to_sleep) {
-	pthread_t thread_id = pthread_self();
-
-	sleep((uint32_t) time_to_sleep);
-	printf("Hello I'm a thread with the id %d!\n" , thread_id);
-
-	return (void*) thread_id; // Behaves the same as pthread_exit()
+void print_time(const struct timespec* time) {
+	printf("Current Time %d s, %ld ms\n", time->tv_sec, time->tv_nsec);
 }
 
+void changeSystemTick(unsigned int microsecs) {
 
+	struct _clockperiod period;
+	period.nsec = microsecs * 1000;
+	period.fract = 0;
+
+	struct _clockperiod old_period;
+
+	if (-1 == ClockPeriod(CLOCK_REALTIME, &period, &old_period, 0)) {
+		printf("Clock failed, err: %i\n", errno);
+		printf("Current clock: %ld us\n", old_period.nsec / 1000);
+		return;
+	}
+	printf("old clock: %ld us\n", old_period.nsec / 1000);
+	printf("new clock: %ld us\n", period.nsec / 1000);
+
+}
 
 int main(int argc, char *argv[]) {
-	pthread_t threadId1;
-	pthread_t threadId2;
+	changeSystemTick(10); //min value for clockPeriod is 10us, otherwise Invalid Argument is thrown
 
-	if(EOK != pthread_create(&threadId1, NULL, thread_work, (void*)1)) {
-		printf("Error on first thread creation");
+	int i;
+	struct timespec current;
+	if (-1 == clock_gettime(CLOCK_REALTIME, &current)) {
+		perror("clock gettime");
 		return EXIT_FAILURE;
 	}
 
-	if(EOK != pthread_create(&threadId2, NULL, thread_work, (void*)2)) {
-		printf("Error on second thread creation");
-		return EXIT_FAILURE;
+	print_time(&current);
+	for (i = 0; i < 100; i++) {
+		current.tv_nsec += 1000000; // 1ms
+
+		if (-1 == clock_nanosleep(CLOCK_REALTIME, TIMER_ABSTIME, &current, NULL)) {
+			perror("clock nanosleep");
+			return EXIT_FAILURE;
+		}
+
+		if (-1 == clock_gettime(CLOCK_REALTIME, &current)) {
+			perror("clock gettime");
+			return EXIT_FAILURE;
+		}
+
+		print_time(&current); // Assumption: takes less than 1ms
 	}
-
-	void *result1;
-	void *result2;
-
-	if(EOK != pthread_join(threadId1, &result1)) {
-		printf("Thread joining failed");
-		return EXIT_FAILURE;
-	}
-	printf("Thread 1 Ids %d, %d\n", threadId1, (int)result1);
-
-	if(EOK != pthread_join(threadId2, &result2)) {
-		printf("Thread joining failed");
-		return EXIT_FAILURE;
-	}
-	printf("Thread 2 Ids %d, %d\n", threadId2, (int)result2);
-
-	printf("EXIT PROGRAM\n");
 
 	return EXIT_SUCCESS;
 }
