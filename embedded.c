@@ -22,8 +22,14 @@ void changeSystemTick(unsigned int microsecs) {
 		printf("Current clock: %ld us\n", old_period.nsec / 1000);
 		return;
 	}
-	printf("old clock: %ld us\n", old_period.nsec / 1000);
-	printf("new clock: %ld us\n", period.nsec / 1000);
+
+	if (-1 == ClockPeriod(CLOCK_REALTIME, NULL, &period, 0)) {
+		printf("Clock failed, err: %i\n", errno);
+		printf("Current clock: %ld us\n", old_period.nsec / 1000);
+		return;
+	}
+	printf("clock before set: %ld us\n", old_period.nsec / 1000);
+	printf("clock after set: %ld us\n", period.nsec / 1000);
 
 }
 
