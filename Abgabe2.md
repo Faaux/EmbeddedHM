@@ -16,5 +16,6 @@ Der clock_id Parameter in den Funktionen clock_nanosleep und clock_gettime wurde
 Die korrekte Funktionsweise wird ermittelt indem die Zeiten vor und nach dem Aufruf von clock_nanosleep miteinander verglichen werden. Diese Zeiten werden in folgenden Aufgaben genauer betrachtet, da diese vom SystemTick und der zu schlafenden Zeit abhängig sind.
 
 ### Teilaufgabe 2
-##### Realisierung einer Funktion die den Systemtackt ändert
+##### Realisierung einer Funktion die den Systemtakt ändert
 
+Der Systemtakt gibt die Frequenz an, wie oft die CPU von der Clock interrupted wird. Mit der Funktion ClockPeriod können Änderungen an der Frequenz vorgenommen werden und die aktuelle Frequenz der clock abgefragt werden. Zuerst setzen wir die Frequenz auf den an die Funktion übergebenen micro-Sekunden Wert. Anschließend wird der Wert erneut abgefragt, um festzustellen ob eine Änderung der Frequenz statt gefunden hat.
