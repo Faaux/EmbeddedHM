@@ -24,3 +24,7 @@ Minimaler Wert für die Zykluszeit des Systemtakts sind 10 Mikrosekunden. Bei ei
 
 ### Teilaufgabe 3
 ##### Auswirkungen auf die Teilaufgabe 1 durch Modifikation des Systemtakts
+
+![Diagramm.pdf](https://github.com/Faaux/EmbeddedHM/blob/master/diagramm.png)
+
+![Diagramm.pdf](https://github.com/Faaux/EmbeddedHM/blob/master/diagramm2.png)
