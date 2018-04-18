@@ -18,4 +18,9 @@ Die korrekte Funktionsweise wird ermittelt indem die Zeiten vor und nach dem Auf
 ### Teilaufgabe 2
 ##### Realisierung einer Funktion die den Systemtakt ändert
 
-Der Systemtakt gibt die Frequenz an, wie oft die CPU von der Clock interrupted wird. Mit der Funktion ClockPeriod können Änderungen an der Frequenz vorgenommen werden und die aktuelle Frequenz der clock abgefragt werden. Zuerst setzen wir die Frequenz auf den an die Funktion übergebenen micro-Sekunden Wert. Anschließend wird der Wert erneut abgefragt, um festzustellen ob eine Änderung der Frequenz statt gefunden hat.
+Der Systemtakt (Tickrate) gibt die Frequenz an, wie oft die CPU von der Clock interrupted wird. Mit der Funktion "ClockPeriod" können Änderungen an der Frequenz vorgenommen werden, sowie die aktuelle Frequenz der clock abgefragt werden. Zuerst setzen wir die Frequenz auf den an die Funktion "changeSystemTick" übergebenen Mikrosekunden Wert. "ChangeSystemTick" gibt uns gleichzeitig die Tickrate vor der Änderung zurück. Anschließend wird die aktuelle Tickrate abgefragt und mit der alten Tickrate verglichen, um festzustellen ob eine Änderung der Frequenz statt gefunden hat.
+
+Minimaler Wert für die Zykluszeit des Systemtakts sind 10 Mikrosekunden. Bei einem Wert unterhalb von 10 Mikrosekunden gibt "ClockPeriod" den Fehler "Invalid Argument" zurück.
+
+### Teilaufgabe 3
+##### Auswirkungen auf die Teilaufgabe 1 durch Modifikation des Systemtakts
