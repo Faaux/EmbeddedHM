@@ -25,6 +25,10 @@ Minimaler Wert für die Zykluszeit des Systemtakts sind 10 Mikrosekunden. Bei ei
 ### Teilaufgabe 3
 ##### Auswirkungen auf die Teilaufgabe 1 durch Modifikation des Systemtakts
 
+![Diagramm.pdf](https://github.com/Faaux/EmbeddedHM/blob/master/diagramm2.png)
+
+Das obige Diagramm zeigt, wie die Änderungen des Systemtakts den in Teilaufgabe 1 erstellen Takt von 1ms beeinflussen. Der Systemtakt wird von 10 Mikrosekunden (kleinster möglicher Wert) kontinuierlich auf einen Systemtakt von 1ms erhöht. Die y-Achse zeigt wie lange das Programm tatsächlich geschlafen hat. Normalerweise sollte das Diagramm eine horizontale Line bei 1.000.000 ns zeigen, was genau dem Takt von 1ms entspricht. Die CPU ist allerdings bei den hohen Tickraten so mit sich selbst beschäftigt, ständig die Zeit zu überwachen und Interrupts auszulösen, so dass das Programm erst viel später wieder aufgweckt wird. Aus der hohen Auslastung der CPU resultieren somit die Abweichungen des Takts.
+
 ![Diagramm.pdf](https://github.com/Faaux/EmbeddedHM/blob/master/diagramm.png)
 
-![Diagramm.pdf](https://github.com/Faaux/EmbeddedHM/blob/master/diagramm2.png)
+Im zweiten Diagramm ist der Ausschnitt des System Tick noch vergrößert. Hier geht der System Tick über den Takt von 1ms hinaus. Das Programm soll 1ms schlafen, wird beispielsweise beim einem System Tick von 2ms aber erst nach 2ms aufgeweckt.
