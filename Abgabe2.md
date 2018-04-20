@@ -31,4 +31,4 @@ Das obige Diagramm zeigt, wie die Änderungen des Systemtakts den in Teilaufgabe
 
 ![Diagramm.pdf](https://github.com/Faaux/EmbeddedHM/blob/master/diagramm.png)
 
-Im zweiten Diagramm ist der Ausschnitt des System Tick noch vergrößert. Hier geht der System Tick über den Takt von 1ms hinaus. Das Programm soll 1ms schlafen, wird beispielsweise beim einem System Tick von 2ms aber erst nach 2ms aufgeweckt.
+Im zweiten Diagramm ist der Ausschnitt des System Tick noch vergrößert. Hier geht der System Tick über den Takt von 1ms hinaus. Das Programm soll 1ms schlafen, wird beispielsweise beim einem System Tick von 2ms aber erst nach 2ms aufgeweckt. Dies liegt daran das der Systemtick die Uhr nur alle 2ms durch einen Interrupt aktualisiert. In unserem Fall (1 Thread) bedeutet dies das beim Interrupt der Scheduler festetllt das der Zeitpunkt abgelaufen ist auf den gewartet wurde, somit wird der Thread aufgeweckt.
