@@ -41,6 +41,13 @@ void waste_msec_internal() {
 	}
 }
 
+void waste_msec(unsigned int msecs) {
+
+	int i;
+	for (i = 0; i < msecs; i++)
+		waste_msec_internal();
+}
+
 void calibrate_waste_scaling() {
 	struct timespec current;
 	struct timespec after;
@@ -49,11 +56,8 @@ void calibrate_waste_scaling() {
 	if (-1 == clock_gettime(CLOCK_REALTIME, &current)) {
 		perror("clock_gettime");
 	}
-
-	int i;
-	for (i = 0; i < ITERATIONS; i++) {
-		waste_msec_internal();
-	}
+	
+	waste_msec(ITERATIONS);
 
 	if (-1 == clock_gettime(CLOCK_REALTIME, &after)) {
 		perror("clock_gettime");
@@ -70,13 +74,6 @@ void calibrate_waste_scaling() {
 	waste_scaling = 1.f / time_slept_ms;
 	printf("Time Slept ms: %f\n", time_slept_ms);
 	printf("Waste_scaling: %f\n", waste_scaling);
-}
-
-void waste_msec(unsigned int msecs) {
-
-	int i;
-	for (i = 0; i < msecs; i++)
-		waste_msec_internal();
 }
 
 void do_waste_stess_test() {
