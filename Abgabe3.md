@@ -58,7 +58,7 @@ waste_scaling = 1.f / time_slept_ms;
 Bei Wartezeiten von 1ms bis 2000ms auf dem Main-Thread wurden Abweichungen im Rahmen von 0-10ms gemessen. Es gab hierbei keine Korrelation zur Wartezeit selbst.
 
 ##### Prioritäten laufender Prozesse
-Alle laufende Prozesse und Informationen zu diesen kann über den Befehl [pidin](http://www.qnx.com/developers/docs/7.0.0/#com.qnx.doc.neutrino.utilities/topic/p/pidin.html) abgefragt werden, es wird ersichtlich das 0 die niedrigste Priorität ist.
+Alle laufende Prozesse und Informationen zu diesen kann über den Befehl [pidin](http://www.qnx.com/developers/docs/7.0.0/#com.qnx.doc.neutrino.utilities/topic/p/pidin.html) abgefragt werden. Hierfür muss eine Verbindung über ```telnet``` auf das BeagleBone hergestellt werden. Es wird ersichtlich das 0 die niedrigste Priorität ist.
 
 ##### Erstelung eines Threads mit gehobener Priorität
 
