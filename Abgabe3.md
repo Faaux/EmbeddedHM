@@ -1,4 +1,4 @@
-# Aufgabe 2: QNX - Verarbeitungszeit
+# Aufgabe 3: QNX - Verarbeitungszeit
 Embedded Computing, Teilgruppe 2, Florian Tobusch - Chris Brammer
 
 ##### Implementierung von waste_msecs(unsigned int msecs)
