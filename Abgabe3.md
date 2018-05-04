@@ -32,7 +32,7 @@ void waste_msec(unsigned int msecs) {
 ```
 ##### Kalibrierung
 
-Gemessen werden eine bestimmte Anzahl Iterationen des Fibonacciaufrufs (```waste_msec_internal```). Da jeder Aufruf genau 1ms dauern soll wird der Skalierungsfaktor ```waste_scaling``` auf den Inversen Wert der gemessen Zeit pro Aufruf gesetzt.
+Gemessen werden eine bestimmte Anzahl Iterationen des Fibonacci Aufrufs (```waste_msec_internal```). Da jeder Aufruf genau 1ms dauern soll wird der Skalierungsfaktor ```waste_scaling``` auf den inversen Wert der gemessen Zeit pro Aufruf gesetzt.
 
 ```c
 if (-1 == clock_gettime(CLOCK_REALTIME, &current)) {
@@ -84,7 +84,7 @@ pthread_join(worker, NULL);
 
 Gleich wie auf dem Main-Thread wird auf dem Thread zuerst eine Kalibrierung durchgeführt und anschliessend eine Zeit gewartet. Die tatsächlich vergangene Zeit wird gemessen.
 
-Klar zu sehen war das durch die hohe Priorität des Thread die Ergebnisse sehr viel konsistenter sind da andere Prozesse (Single Core) uns nicht unterbrechen können. Zum Beispiel kommt der Debugger (Prozess auf dem Board) nicht mehr zum Zuge um z.B Ausgaben an die IDE zu schicken.
+Klar zu sehen war das durch die hohe Priorität des Threads die Ergebnisse sehr viel konsistenter sind da andere Prozesse (Single Core) uns nicht unterbrechen können. Zum Beispiel kommt der Debugger (Prozess auf dem Board) nicht mehr zum Zuge um z.B Ausgaben an die IDE zu schicken.
 
 ##### Einfluss des System Ticks
 Der System Tick wurde mit 1ms gewählt da dieser einen großen Einfluss auf die Ausführungszeit der Messung haben kann. Da der System Tick das System unterbricht (unabhängig von der Priorität) wird bei steigender Tickfrequenz ```waste_msecs``` öfter unterbrochen und somit die Ausführungszeit gestreckt.
