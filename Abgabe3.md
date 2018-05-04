@@ -66,15 +66,15 @@ Alle laufende Prozesse und Informationen zu diesen kann über den Befehl [pidin]
 pthread_t worker;
 pthread_attr_t worker_attr;
 
-struct sched_param worker_sched_param;
+struct sched_param worker_sched_param; //sched_curpriority is ignored
 worker_sched_param.sched_priority = sched_get_priority_max(SCHED_RR);
 
-pthread_attr_init(&worker_attr);
-pthread_attr_setinheritsched(&worker_attr, PTHREAD_EXPLICIT_SCHED);
-pthread_attr_setschedparam(&worker_attr, &worker_sched_param);
+pthread_attr_init(&worker_attr); //initialize thread-attribute object to default values
+pthread_attr_setinheritsched(&worker_attr, PTHREAD_EXPLICIT_SCHED); //disable scheduling policy from parent thread
+pthread_attr_setschedparam(&worker_attr, &worker_sched_param); //define scheduling parameters
 
 if (EOK != pthread_create(&worker, &worker_attr, &worker_thread, NULL)) {
-  perror("Error during thread creation");
+	perror("Error during thread creation");
 }
 
 pthread_join(worker, NULL);
