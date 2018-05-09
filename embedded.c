@@ -3,12 +3,18 @@
 #include <errno.h>
 #include <math.h>
 #include <time.h>
+#include <signal.h>
+#include <sys/siginfo.h>
 #include <sys/neutrino.h>
 #include <pthread.h>
 #include <sched.h>
+#include <semaphore.h>
 
 #define BILLION 1000000000L
 #define ITERATIONS 90
+
+sem_t p1_takt;
+sem_t p2_takt;
 
 void changeSystemTick(unsigned int microsecs) {
 
@@ -56,7 +62,7 @@ void calibrate_waste_scaling() {
 	if (-1 == clock_gettime(CLOCK_REALTIME, &current)) {
 		perror("clock_gettime");
 	}
-	
+
 	waste_msec(ITERATIONS);
 
 	if (-1 == clock_gettime(CLOCK_REALTIME, &after)) {
@@ -76,75 +82,88 @@ void calibrate_waste_scaling() {
 	printf("Waste_scaling: %f\n", waste_scaling);
 }
 
-void do_waste_stess_test() {
-	unsigned int time_to_sleep_ms = 10;
+void* pthread_1_worker(void* ignored) {
 
-	struct timespec current;
-	struct timespec after;
-	if (-1 == clock_gettime(CLOCK_REALTIME, &current)) {
-		perror("clock_gettime");
+	int ticks = 0;
+	while (1) {
+		sem_wait(&p1_takt);
+		printf("P1 TICK\n");
+		waste_msec(2);
+		if (ticks == 2) {
+			sem_post(&p2_takt);
+		}
+		ticks = (ticks + 1) % 3;
 	}
-
-	int i;
-	for (i = 0; i < ITERATIONS; i++) {
-		waste_msec(time_to_sleep_ms);
-	}
-
-	if (-1 == clock_gettime(CLOCK_REALTIME, &after)) {
-		perror("clock_gettime");
-	}
-
-	float time_slept_ms = 0;
-	time_slept_ms += (after.tv_sec - current.tv_sec) * 1000.f;
-	time_slept_ms += (after.tv_nsec - current.tv_nsec) / (1000.f * 1000.f);
-
-	printf("Time slept: %f (ms)\n", time_slept_ms);
-	printf("Time error absolute: %f (ms)\n",
-			fabsf(ITERATIONS * time_to_sleep_ms - time_slept_ms));
-}
-
-int get_thread_priority() {
-	struct sched_param sched_param;
-
-	if (EOK != pthread_getschedparam(pthread_self(), NULL, &sched_param)) {
-		perror("pthread_getschedparam()");
-	}
-
-	return sched_param.sched_priority;
-}
-
-void* worker_thread(void* ignored) {
-
-	printf("Thread priority: %i\n", get_thread_priority());
-
-	calibrate_waste_scaling();
-	do_waste_stess_test();
 
 	return 0;
+}
+
+void* pthread_2_worker(void* ignored) {
+
+	while (1) {
+		sem_wait(&p2_takt);
+		printf("P2 TICK\n");
+		waste_msec(3);
+	}
+	return 0;
+}
+
+void signal_handler(_SIG_ARGS) {
+	sem_post(&p1_takt);
 }
 
 int main(int argc, char *argv[]) {
 	changeSystemTick(1000);
 
-	printf("process priority: %i\n", get_thread_priority());
 	calibrate_waste_scaling();
-	do_waste_stess_test();
 
-	pthread_t worker;
-	pthread_attr_t worker_attr;
+	//init semaphore
+	sem_init(&p1_takt, 0, 0);
+	sem_init(&p2_takt, 0, 0);
 
-	struct sched_param worker_sched_param;
-	worker_sched_param.sched_priority = sched_get_priority_max(SCHED_RR);
-
-	pthread_attr_init(&worker_attr);
-	pthread_attr_setinheritsched(&worker_attr, PTHREAD_EXPLICIT_SCHED);
-	pthread_attr_setschedparam(&worker_attr, &worker_sched_param);
-
-	if (EOK != pthread_create(&worker, &worker_attr, &worker_thread, NULL)) {
+	pthread_t p1_worker;
+	if (EOK != pthread_create(&p1_worker, NULL, &pthread_1_worker, NULL)) {
 		perror("Error during thread creation");
 	}
 
-	pthread_join(worker, NULL);
+	pthread_t p2_worker;
+	if (EOK != pthread_create(&p2_worker, NULL, &pthread_2_worker, NULL)) {
+		perror("Error during thread creation");
+	}
+
+	// Which action on signal
+	struct sigaction act;
+	sigset_t set;
+	sigemptyset(&set);
+
+	act.sa_flags = 0;
+	act.sa_mask = set;
+	act.sa_handler = &signal_handler;
+
+	// Set action on signal
+	sigaction(SIGUSR1, &act, NULL);
+
+
+	// Which event to use
+	struct sigevent event;
+	SIGEV_SIGNAL_INIT(&event, SIGUSR1);
+
+	// Create timer on event
+	timer_t timer;
+	timer_create(CLOCK_REALTIME, &event, &timer);
+
+	// Start timer in interval
+	long timer_interval = 4000000;
+	struct itimerspec itime;
+	itime.it_value.tv_sec = 0;
+	itime.it_value.tv_nsec = timer_interval;
+	itime.it_interval.tv_sec = 0;
+	itime.it_interval.tv_nsec = timer_interval;
+	timer_settime(timer, 0, &itime, NULL);
+	
+
+	pthread_join(p1_worker, NULL);
+	pthread_join(p2_worker, NULL);
 
 	return EXIT_SUCCESS;
 }
